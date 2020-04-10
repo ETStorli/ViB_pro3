@@ -1,6 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+def f(theta, chi, xi, n): return np.array([chi, -theta**n - 2*chi/xi])
+
 def plot(t, plot, title):
     """
     Very useful plotting function, both useful for plot with one graph and multiple graphs
@@ -17,7 +19,7 @@ def plot(t, plot, title):
     plt.legend(loc="best")
     plt.show()
 
-def euler(y, f, h=h):
+def euler(y, f, n, h=h):
     """
     :param y: Vector with initial values for theta and chi
     :param f: Stepfunction used for the nummerical approximation
@@ -29,8 +31,9 @@ def euler(y, f, h=h):
     chi[0] = y[1]
     xi = np.linspace(0,N,n)
     for i in range(n-1):
-        theta[i+1] = theta[i] + h*f[0](theta[i], chi[i])
-        chi[i + 1] = chi[i] + h*f[1](theta[i], chi[i])
+        F = f(theta[i], chi[i], xi[i], n)
+        theta[i+1] = theta[i] + h*F[0]
+        chi[i + 1] = chi[i] + h*F[1]
     return xi, theta, chi
 
 def RK4_step():
