@@ -1,64 +1,103 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-def f(theta, chi, xi, n): return np.array([chi, -theta**n - 2*chi/xi])
+def f(xi, y, n): return np.array([y[1], -y[0]**n - 2*y[1]/xi])
 
-
-def plot(t, plot, title):
-    """
-    Very useful plotting function, both useful for plot with one graph and multiple graphs
-    :param t: Array-like with time values for the plot
-    :param plot: Array-like with pairs of what is to be plotted along y-axis and label. i.g. [y, "position", z, "sinus"]
-    :param title: Title for the plot
-    :return: nothing, shows the graph at the end
-    """
-    plt.xlabel(r"$\xi$")
-    plt.ylabel(r"$\theta$")
-    plt.title(title)
-    for i in range(0, len(plot), 2):
-        plt.plot(t, plot[i], label=plot[i+1])
-    plt.legend(loc="best")
-    plt.show()
 
 def euler(y, f, n, h):
     """
-    :param y: Vector with initial values for theta and chi
-    :param f: Stepfunction used for the nummerical approximation
+    :param y: Vector with initial values for theta and chi respectively
+    :param f: Stepfunction used for the numerical approximation
     :param n: Polytropic index
     :param h: Steplenght
+    :return: The numerical solution to the system of differential equations with the euler-method
     """
     theta = np.array([y[0]])
     chi = np.array([y[1]])
     xi = np.array([.001])
     switch = True
     while switch:
-        F = f(theta[-1], chi[-1], xi[-1], n)
+        F = f(xi[-1], [theta[-1], chi[-1]], n)
         theta = np.append(theta, theta[-1] + h*F[0])
         chi = np.append(chi, chi[-1] + h*F[1])
         xi = np.append(xi, xi[-1]+h)
-        #print("1")
         if theta[-1]*theta[-2]<0:
             switch = False
     return xi, theta, chi
 
+
+def RK4_step(xi, y, f, h, n):
+    """
+    Calculates one step of the RK4-algorithm
+    :param xi: The value of xi we evaluate y at
+    :param y: Array-like with the previous values of theta and chi respectively
+    :param f: The function that describes the system of differential equations (y' = f, vector form)
+    :param h: Step-size
+    :param n: Polytropic index
+    :return: Next value of theta and xi in an array
+    """
+    k1 = f(xi, y, n)
+    k2 = f(xi + h/2, y + h*k1/2, n)
+    k3 = f(xi + h/2, y + h*k2/2, n)
+    k4 = f(xi + h, y + h*k3, n)
+    S = 1/6*(k1 + 2*k2 + 2*k3 +k4)
+    return y + h*S
+
+
+def RK4_method(y, f, n, h):
+    """
+    Calls on RK4_step() to calculate the next values of theta and xi for each iteration
+    :param y: Vector with initial values for theta and chi respectively
+    :param f: Stepfunction used for the numerical approximation
+    :param n: Polytropic index
+    :param h: Steplenght
+    :return: The numerical solution to the system of differential equations with the RK4-method
+    """
+    theta = np.array([y[0]])
+    chi = np.array([y[1]])
+    xi = np.array([.001])
+    switch = True
+    while switch:
+        F = RK4_step(xi[-1], [theta[-1], chi[-1]], f, h, n)
+        theta = np.append(theta, F[0])
+        chi = np.append(chi, F[1])
+        xi = np.append(xi, xi[-1]+h)
+        if theta[-1]*theta[-2]<0:
+            switch = False
+    return xi, theta, chi
+
+
 y = np.array([1,0])
+n = 1
 
-xi1, theta1, _ = euler(y, f, 1, .5)
-xi2, theta2, _ = euler(y, f, 1, .1)
-xi3, theta3, _ = euler(y, f, 1, .01)
-xi4, theta4, _ = euler(y, f, 1, .001)
-
-plt.plot(xi1, theta1, label ="h=.5")
-plt.plot(xi2, theta2, label="h=.1")
-plt.plot(xi3, theta3, label="h=.01")
-plt.plot(xi4, theta4, label="h=.001")
-plt.plot(xi4, np.sin(xi4)/xi4, label="analytisk")
-plt.legend(loc="best")
+xi, theta,_  = euler(y, f, n, 0.5)
+plt.plot(xi, theta, label="h=0.5")
+xi, theta,_  = euler(y, f, n, 0.1)
+plt.plot(xi, theta, label="h=0.1")
+xi, theta,_  = euler(y, f, n, 0.01)
+plt.plot(xi, theta, label="h=0.01")
+xi, theta,_  = euler(y, f, n, 0.0001)
+plt.plot(xi, theta, label="h=0.0001")
+plt.plot(xi, np.sin(xi)/xi, label="analytisk, n=1")
+plt.title("Numerical solution with ther Euler-method")
+plt.legend(loc='best')
+plt.xlabel(r"$\xi$")
+plt.ylabel(r"$\theta$")
 plt.show()
+print(xi[-1], xi[-2])
 
-
-def RK4_step():
-    "one step of Runge-Kutta"
-
-def RK4():
-    "Calls on RK4_step() to find the values for each iteration to solve the system of differential equations"
+xi, theta,_  = RK4_method(y, f, n, 0.5)
+plt.plot(xi, theta, label="h=0.5")
+xi, theta,_  = RK4_method(y, f, n, 0.1)
+plt.plot(xi, theta, label="h=0.1")
+xi, theta,_  = RK4_method(y, f, n, 0.01)
+plt.plot(xi, theta, label="h=0.01")
+xi, theta,_  = RK4_method(y, f, n, 0.0001)
+plt.plot(xi, theta, label="h=0.0001")
+plt.plot(xi, np.sin(xi)/xi, label="analytisk, n=1")
+plt.title("Numerical solution with the RK4-method")
+plt.legend(loc='best')
+plt.xlabel(r"$\xi$")
+plt.ylabel(r"$\theta$")
+plt.show()
+print(xi[-1], xi[-2])
