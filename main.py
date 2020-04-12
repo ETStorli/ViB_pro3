@@ -64,40 +64,61 @@ def RK4_method(y, f, n, h):
         xi = np.append(xi, xi[-1]+h)
         if theta[-1]*theta[-2]<0:
             switch = False
-    return xi, theta, chi
+    return theta, xi , chi
 
 
 y = np.array([1,0])
 n = 1
 
-xi, theta,_  = euler(y, f, n, 0.5)
-plt.plot(xi, theta, label="h=0.5")
-xi, theta,_  = euler(y, f, n, 0.1)
-plt.plot(xi, theta, label="h=0.1")
-xi, theta,_  = euler(y, f, n, 0.01)
-plt.plot(xi, theta, label="h=0.01")
-xi, theta,_  = euler(y, f, n, 0.0001)
-plt.plot(xi, theta, label="h=0.0001")
-plt.plot(xi, np.sin(xi)/xi, label="analytisk, n=1")
-plt.title("Numerical solution with ther Euler-method")
-plt.legend(loc='best')
-plt.xlabel(r"$\xi$")
-plt.ylabel(r"$\theta$")
-plt.show()
-print(xi[-1], xi[-2])
 
-xi, theta,_  = RK4_method(y, f, n, 0.5)
-plt.plot(xi, theta, label="h=0.5")
-xi, theta,_  = RK4_method(y, f, n, 0.1)
-plt.plot(xi, theta, label="h=0.1")
-xi, theta,_  = RK4_method(y, f, n, 0.01)
-plt.plot(xi, theta, label="h=0.01")
-xi, theta,_  = RK4_method(y, f, n, 0.0001)
-plt.plot(xi, theta, label="h=0.0001")
-plt.plot(xi, np.sin(xi)/xi, label="analytisk, n=1")
-plt.title("Numerical solution with the RK4-method")
-plt.legend(loc='best')
-plt.xlabel(r"$\xi$")
-plt.ylabel(r"$\theta$")
+def error_n(h0, h1, trinn):
+    """
+    theta1 ,_,_ = euler (y, g1, g2, h0, 3 / 2)
+    theta2 ,_,_= euler (y, g1, g2, h0, 3)
+    theta3 ,_,_= RK4_method(y, f, 3/2, h0)
+    theta4 ,_,_= RK4_method (y, f, 3, h0)
+    """
+    irele_err = np.array([1])
+    urele_err = np.array([1])
+    irelrk_err = np.array([1])
+    urelrk_err = np.array([1])
+    h_list = np.linspace(h1, h0, trinn)
+    for i in h_list:
+        print ("i :", i)
+        theta1,_ ,_ = euler (y, f, 3/2, i)
+        print ("i :", i)
+        theta2,_,_ = euler (y, f, 3, i)
+        print ("i :", i)
+        theta3,_,_ = RK4_method (y, f, 3 / 2, i)
+        print ("i :", i)
+        theta4,_,_ = RK4_method (y, f, 3, i)
+        irele_err = np.append(irele_err, theta1[-1])
+        urele_err = np.append(urele_err, theta2[-1])
+        irelrk_err = np.append(irelrk_err, theta3[-1])
+        urelrk_err = np.append(urelrk_err, theta4[-1])
+        print("i :",i)
+    return irele_err, urele_err, irelrk_err, urelrk_err
+
+
+#plott for oppg 3g
+
+irele_err, urele_err, irelrk_err, urelrk_err = error_n(0.001, 0.9, 2)
+
+x = np.linspace(0.001, 0.9, 2)
+
+plt.figure()
+plt.plot(x, irele_err, '-.', label="irel euler error")
+plt.plot(x, irelrk_err, '-.', label="irel RK4 error")
+plt.legend()
+plt.ylabel("h error")
+plt.xlabel("trinnlengde h")
 plt.show()
-print(xi[-1], xi[-2])
+
+plt.figure()
+plt.plot(x, urele_err, '-.', label="urel euler error")
+plt.plot(x, urelrk_err, '-.', label="urel RK4 error")
+plt.legend()
+plt.ylabel("h error")
+plt.xlabel("trinnlengde h")
+plt.show()
+
