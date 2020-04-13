@@ -171,7 +171,7 @@ def plot2_3g(n0, n1, N):
     plt.xlabel("Trinnlengde h")
     plt.show()
 
-def plot3_i(alph, solved_p, analy_p, h):
+def plot3_i(alph, solved_p, analy_p, h, a ):
     for i in range(len(alph)):
         x = np.linspace(solved_p[i][0], solved_p[i][-1], 1000)
         plt.figure()
@@ -179,6 +179,8 @@ def plot3_i(alph, solved_p, analy_p, h):
         plt.plot(x, analy_p(x, alph[i]), 'b.', label="analytisk")
         plt.plot(x, solved_p[i][0], 'r.', label="euler")
         plt.plot(x, solved_p[i][1], 'g.', label="RK 4")
+        if a:
+            plt.plot(x, (0.25*alph*(1-x**2)), '.', label="newtonsk approximasjon")
         plt.legend()
         plt.xscale("log")
         plt.yscale("log")
