@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
-y = np.array([1,0])
+y = np.array([[1],[0]])
 #fra piazza
 xiN3 = 6.89684861937
 xiN3_2 = 3.653753736219229
@@ -15,18 +15,18 @@ def euler(y, f, n, h):
     :param h: Steplenght
     :return: The numerical solution to the system of differential equations with the euler-method
     """
-    theta = np.array([y[0]])
-    chi = np.array([y[1]])
-    xi = np.array([.00001])
+    Y = y
+    xi = np.array([.001])
     switch = True
     while switch:
-        F = f(xi[-1], [theta[-1], chi[-1]], n)
-        theta = np.append(theta, theta[-1] + h*F[0])
-        chi = np.append(chi, chi[-1] + h*F[1])
+        F = f(xi[-1], Y[:, -1], n)      #Y, last item of every array in Y
+        placeholder = Y[:,-1] + h*F
+        Y = np.hstack((Y, [[item] for item in placeholder]))
         xi = np.append(xi, xi[-1]+h)
-        if theta[-1]*theta[-2]<0:
+        if Y[0, -1]*Y[0, -2]<0:
             switch = False
-    return xi[:-1], theta[:-1], chi[:-1]
+    Y = [item[:-1] for item in Y]   #removes the last item in every array in Y
+    return xi[:-1], Y
 
 
 def RK4_step(xi, y, f, h, n):
@@ -116,14 +116,14 @@ def plot3_d_f(method, title, n=1, y=y, f=f):
     :return: Nothing, plots the graphs
     """
     plt.figure()
-    xi, theta, _ = method(y, f, n, 0.5)
-    plt.plot(xi, theta,'-.', label="h=0.5")
-    xi, theta, _ = method(y, f, n, 0.1)
-    plt.plot(xi, theta, '-.',label="h=0.1")
-    xi, theta, _ = method(y, f, n, 0.05)
-    plt.plot(xi, theta, '-.',label="h=0.05")
-    xi, theta, _ = method(y, f, n, 0.001)
-    plt.plot(xi, theta, '-.',label="h=0.001")
+    xi, Y= method(y, f, n, 0.5)
+    plt.plot(xi, Y[0],'-.', label="h=0.5")
+    xi, Y= method(y, f, n, 0.1)
+    plt.plot(xi, Y[0], '-.',label="h=0.1")
+    xi, Y= method(y, f, n, 0.05)
+    plt.plot(xi, Y[0], '-.',label="h=0.05")
+    xi, Y= method(y, f, n, 0.001)
+    plt.plot(xi, Y[0], '-.',label="h=0.001")
     plt.plot(xi, np.sin(xi) / xi, '-.',label="Analytic")
     plt.title(title)
     plt.legend(loc='best')
@@ -188,7 +188,10 @@ def plot3_i(alph, solved_p, analy_p, h, a ):
         plt.yscale("log")
         plt.show()
 
+#Plotter oppgave 3d
+plot3_d_f(euler, "Numerical solution with the Euler-method")
+
 #Plotter oppgave 3f
 #plot3_d_f(RK4_method, "Numerical solution with the RK4-method")
 
-plot1_3g(1, 1000, 1)
+#plot1_3g(1, 1000, 1)
