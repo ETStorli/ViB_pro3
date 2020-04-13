@@ -132,6 +132,8 @@ def plot3_d_f(method, title, n=1, y=y, f=f):
     plt.show()
 
 
+
+
 def plot1_3g(n0, n1, N):
     """
     Plot-function for the ultra-relativistic case in task 3g
@@ -185,3 +187,8 @@ def plot3_i(alph, solved_p, analy_p, h, a ):
         plt.xscale("log")
         plt.yscale("log")
         plt.show()
+
+#Plotter oppgave 3f
+#plot3_d_f(RK4_method, "Numerical solution with the RK4-method")
+
+plot1_3g(1, 1000, 1)
