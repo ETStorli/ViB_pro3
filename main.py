@@ -93,7 +93,7 @@ def error_funk(n0, n1, N, xi_N):
         RK4_err = np.append(RK4_err, np.abs(theta2[-1]))
     return Euler_err[1:], RK4_err[1:], h_i, xi1[-1], xi2[-1]
 
-def pfunc(x, alpha, p): return -0.5*alpha*x*(1+p)*(1+3*p)*(1-x**2*alpha)**-1
+def pfunc(x, p, alpha): return np.array(-0.5*alpha*x*(1+p)*(1+3*p)*(1-x**2*alpha)**-1)
 
 def solv_p(alph, pfunc, h):
     """
@@ -105,7 +105,7 @@ def solv_p(alph, pfunc, h):
     """
     solved_p = np.array([[1,1],[2,2],[3,3]])
     for i in range(3):
-        p0 = np.array([(np.sqrt (1 - alph[i]) - 1) / (1 - 3 * np.sqrt (1 - alph[i]))])
+        p0 = np.array([[(np.sqrt (1 - alph[i]) - 1) / (1 - 3 * np.sqrt (1 - alph[i]))]])
         solved_p[i][0] = euler(p0, pfunc, alph[i], h)
         solved_p[i][1] = RK4_method(p0, pfunc, alph[i], h)
     return solved_p
@@ -205,7 +205,7 @@ def plot3_i(alph, solved_p, analy_p, h, a ):
         plt.show()
 
 #Plotter oppgave 3d
-#plot3_d_f(euler, "Numerical solution with the Euler-method")
+plot3_d_f(euler, "Numerical solution with the Euler-method")
 
 #Plotter oppgave 3f
 #plot3_d_f(RK4_method, "Numerical solution with the RK4-method")
@@ -213,6 +213,7 @@ def plot3_i(alph, solved_p, analy_p, h, a ):
 #plot1_3g(1, 1000, 1)
 
 # oppg 3i
+
 alp =[0.86, 0.59, 0.0167]
 solved_p = solv_p(alp, pfunc, 0.01)
 plot3_i(alp, solved_p, analy_p, 0.01, False)
