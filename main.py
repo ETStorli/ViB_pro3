@@ -96,7 +96,13 @@ def error_funk(n0, n1, N, xi_N):
 def pfunc(x, alpha, p): return -0.5*alpha*x*(1+p)*(1+3*p)*(1-x**2*alpha)**-1
 
 def solv_p(alph, pfunc, h):
+    """
 
+    :param alph: liste med 3 alpha verdier, verdt å huske at vi da må iterere gjennom den og
+    :param pfunc: funksjon for deriverte av p, er likn 36
+    :param h: trinnlengde, gikk for 0.01 for simpelhetskyld
+    :return: et 3x2xN rom, hvor N er lengden på skritt som blir tatt av euler eller rk4. Mulig problem oppstår om de har ulik antall total skritt
+    """
     solved_p = np.array([[1,1],[2,2],[3,3]])
     for i in range(3):
         p0 = np.array([(np.sqrt (1 - alph[i]) - 1) / (1 - 3 * np.sqrt (1 - alph[i]))])
@@ -175,6 +181,15 @@ def plot2_3g(n0, n1, N):
     plt.show()
 
 def plot3_i(alph, solved_p, analy_p, h, a ):
+    """
+
+    :param alph: liste med alpha verdier
+    :param solved_p: rom som inneholder løsninger for p
+    :param analy_p: normalisert analytisk løsning for newton redusert approximasjon
+    :param h: skritt
+    :param a: boolk statement som bestemmer plot av analytisk
+    :return: nada
+    """
     for i in range(len(alph)):
         x = np.linspace(0, 1, 1000)
         plt.figure()
