@@ -4,6 +4,8 @@ y = np.array([[1],[0]])
 #fra piazza
 xiN3 = 6.89684861937
 xiN3_2 = 3.653753736219229
+
+
 def f(xi, y, n): return np.array([y[1], -np.abs(y[0])**n - 2*y[1]/xi])
 
 
@@ -56,18 +58,21 @@ def RK4_method(y, f, n, h):
     :param h: Steplenght
     :return: The numerical solution to the system of differential equations with the RK4-method
     """
-    theta = np.array([y[0]])
-    chi = np.array([y[1]])
-    xi = np.array([.00001])
+    #theta = np.array([y[0]])
+    #chi = np.array([y[1]])
+    Y = y
+    xi = np.array([.001])
     switch = True
     while switch:
-        F = RK4_step(xi[-1], [theta[-1], chi[-1]], f, h, n)
-        theta = np.append(theta, F[0])
-        chi = np.append(chi, F[1])
+        F = RK4_step(xi[-1], Y[:, -1], f, h, n)
+        Y = np.hstack((Y, [[item] for item in F]))
+        #theta = np.append(theta, F[0])
+        #chi = np.append(chi, F[1])
         xi = np.append(xi, xi[-1]+h)
-        if theta[-1]*theta[-2]<0:
+        if Y[0, -1]*Y[0, -2]<0:
             switch = False
-    return xi[:-1],theta[:-1], chi[:-1]
+    Y = [item[:-1] for item in Y]  # removes the last item in every array in Y
+    return xi[:-1],Y
 
 
 def error_funk(n0, n1, N, xi_N):
@@ -192,6 +197,6 @@ def plot3_i(alph, solved_p, analy_p, h, a ):
 plot3_d_f(euler, "Numerical solution with the Euler-method")
 
 #Plotter oppgave 3f
-#plot3_d_f(RK4_method, "Numerical solution with the RK4-method")
+plot3_d_f(RK4_method, "Numerical solution with the RK4-method")
 
 #plot1_3g(1, 1000, 1)
