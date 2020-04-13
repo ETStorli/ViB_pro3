@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-def f(xi, y, n): return np.array([y[1], -y[0]**n - 2*y[1]/xi])
+def f(xi, y, n): return np.array([y[1], -np.abs(y[0])**(n) - 2*y[1]/xi])
 
 
 def euler(y, f, n, h):
@@ -57,7 +57,10 @@ def RK4_method(y, f, n, h):
     chi = np.array([y[1]])
     xi = np.array([.001])
     switch = True
+    L=0
     while switch:
+        L+=1
+        print("L:", L)
         F = RK4_step(xi[-1], [theta[-1], chi[-1]], f, h, n)
         theta = np.append(theta, F[0])
         chi = np.append(chi, F[1])
@@ -68,8 +71,8 @@ def RK4_method(y, f, n, h):
 
 
 y = np.array([1,0])
-n = 1
-
+#n = 1
+theta, xi, _ = RK4_method(y, f, 3/2, 0.9)
 
 def error_n(h0, h1, trinn):
     """
