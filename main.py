@@ -96,11 +96,12 @@ def error_funk(n0, n1, N, xi_N):
 def pfunc(x, alpha, p): return -0.5*alpha*x*(1+p)*(1+3*p)*(1-x**2*alpha)**-1
 
 def solv_p(alph, pfunc, h):
-    p0 = (np.sqrt(1-alph)-1)/(1-3*np.sqrt(1-alph))
+
     solved_p = np.array([[1,1],[2,2],[3,3]])
     for i in range(3):
-        solved_p[i][0] = euler(p0, pfunc, alph, h)
-        solved_p[i][1] = RK4_method(p0, pfunc, alph, h)
+        p0 = np.array([(np.sqrt (1 - alph[i]) - 1) / (1 - 3 * np.sqrt (1 - alph[i]))])
+        solved_p[i][0] = euler(p0, pfunc, alph[i], h)
+        solved_p[i][1] = RK4_method(p0, pfunc, alph[i], h)
     return solved_p
 
 def analy_p( x, alph): return (((np.sqrt(1-alph)-np.sqrt(1-alph*x**2))/(np.sqrt(1-alph*x**2)-3*np.sqrt(1-alph))))/ \
@@ -175,7 +176,7 @@ def plot2_3g(n0, n1, N):
 
 def plot3_i(alph, solved_p, analy_p, h, a ):
     for i in range(len(alph)):
-        x = np.linspace(solved_p[i][0], solved_p[i][-1], 1000)
+        x = np.linspace(0, 1, 1000)
         plt.figure()
         plt.title("sammenlikning euler, rk4 og analytisk for h=", h, "og alpha = ", alph[i])
         plt.plot(x, analy_p(x, alph[i]), 'b.', label="analytisk")
