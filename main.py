@@ -58,16 +58,12 @@ def RK4_method(y, f, n, h):
     :param h: Steplenght
     :return: The numerical solution to the system of differential equations with the RK4-method
     """
-    #theta = np.array([y[0]])
-    #chi = np.array([y[1]])
     Y = y
     xi = np.array([.001])
     switch = True
     while switch:
         F = RK4_step(xi[-1], Y[:, -1], f, h, n)
         Y = np.hstack((Y, [[item] for item in F]))
-        #theta = np.append(theta, F[0])
-        #chi = np.append(chi, F[1])
         xi = np.append(xi, xi[-1]+h)
         if Y[0, -1]*Y[0, -2]<0:
             switch = False
