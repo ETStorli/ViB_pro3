@@ -112,13 +112,13 @@ def error_funk(n0, n1, N, xi_N):
     N_i = np.arange(n0, n1, N)
     h_i = xi_N/N_i[::-1]
     for h in h_i:
-        print(h)
-        theta1, xi1, _ = euler(y, f, 3, h)
-        theta2, xi2, _ = RK4_method(y, f, 3, h)
+        #print(h)
+        xi1, theta1, _ = euler(y, f, 3, h)
+        xi2, theta2, _ = RK4_method(y, f, 3, h)
         Euler_err = np.append(Euler_err, np.abs(theta1[-1]))
         RK4_err = np.append(RK4_err, np.abs(theta2[-1]))
+        print(xi1[-1], xi2[-1])
     return Euler_err[1:], RK4_err[1:], h_i, xi1[-1], xi2[-1]
-
 
 
 def plot1_3g(n0, n1, N):
