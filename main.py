@@ -1,7 +1,10 @@
 import matplotlib.pyplot as plt
 import numpy as np
-
-def f(xi, y, n): return np.array([y[1], -np.abs(y[0])**(n) - 2*y[1]/xi])
+y = np.array([1,0])
+#fra piazza
+xiN3 = 6.89684861937
+xiN3_2 = 3.653753736219229
+def f(xi, y, n): return np.array([y[1], -np.abs(y[0])**n - 2*y[1]/xi])
 
 
 def euler(y, f, n, h):
@@ -23,7 +26,7 @@ def euler(y, f, n, h):
         xi = np.append(xi, xi[-1]+h)
         if theta[-1]*theta[-2]<0:
             switch = False
-    return xi, theta, chi
+    return xi[:-1], theta[:-1], chi[:-1]
 
 
 def RK4_step(xi, y, f, h, n):
@@ -57,71 +60,111 @@ def RK4_method(y, f, n, h):
     chi = np.array([y[1]])
     xi = np.array([.001])
     switch = True
-    L=0
     while switch:
-        L+=1
-        print("L:", L)
         F = RK4_step(xi[-1], [theta[-1], chi[-1]], f, h, n)
         theta = np.append(theta, F[0])
         chi = np.append(chi, F[1])
         xi = np.append(xi, xi[-1]+h)
         if theta[-1]*theta[-2]<0:
             switch = False
-    return theta, xi , chi
+    return xi[:-1],theta[:-1], chi[:-1]
 
 
-y = np.array([1,0])
-#n = 1
-theta, xi, _ = RK4_method(y, f, 3/2, 0.9)
-
-def error_n(h0, h1, trinn):
+def plot3_d_f(method, title, n=1, y=y, f=f):
     """
-    theta1 ,_,_ = euler (y, g1, g2, h0, 3 / 2)
-    theta2 ,_,_= euler (y, g1, g2, h0, 3)
-    theta3 ,_,_= RK4_method(y, f, 3/2, h0)
-    theta4 ,_,_= RK4_method (y, f, 3, h0)
+    Plot-function for task 3d and 3f
+    :param method: The numerical method used
+    :param title: The title for the plot
+    :param n: The polytropic index, is 1 for these tasks
+    :param y: The initial conditions
+    :param f: The differential equations for the system
+    :return: Nothing, plots the graphs
     """
-    irele_err = np.array([1])
-    urele_err = np.array([1])
-    irelrk_err = np.array([1])
-    urelrk_err = np.array([1])
-    h_list = np.linspace(h1, h0, trinn)
-    for i in h_list:
-        print ("i :", i)
-        theta1,_ ,_ = euler (y, f, 3/2, i)
-        print ("i :", i)
-        theta2,_,_ = euler (y, f, 3, i)
-        print ("i :", i)
-        theta3,_,_ = RK4_method (y, f, 3 / 2, i)
-        print ("i :", i)
-        theta4,_,_ = RK4_method (y, f, 3, i)
-        irele_err = np.append(irele_err, theta1[-1])
-        urele_err = np.append(urele_err, theta2[-1])
-        irelrk_err = np.append(irelrk_err, theta3[-1])
-        urelrk_err = np.append(urelrk_err, theta4[-1])
-        print("i :",i)
-    return irele_err, urele_err, irelrk_err, urelrk_err
+    plt.figure()
+    xi, theta, _ = method(y, f, n, 0.5)
+    plt.plot(xi, theta,'-.', label="h=0.5")
+    xi, theta, _ = method(y, f, n, 0.1)
+    plt.plot(xi, theta, '-.',label="h=0.1")
+    xi, theta, _ = method(y, f, n, 0.05)
+    plt.plot(xi, theta, '-.',label="h=0.05")
+    xi, theta, _ = method(y, f, n, 0.001)
+    plt.plot(xi, theta, '-.',label="h=0.001")
+    plt.plot(xi, np.sin(xi) / xi, '-.',label="Analytic")
+    plt.title(title)
+    plt.legend(loc='best')
+    plt.xlabel(r"$\xi$")
+    plt.ylabel(r"$\theta(\xi)$")
+    plt.show()
 
 
-#plott for oppg 3g
+def error_funk(n0, n1, N, xi_N):
+    """
+    Function which evaluates the error
+    :param n0: Starting-step
+    :param n1: End-step
+    :param N: Stepsize
+    :param xi_N: The last xi-value we want to hit
+    :return: Arrays with the theta-values from euler and RK4, and the very last xi-value used in the evaluation in euler and RK4
+    """
+    Euler_err = np.array([1])
+    RK4_err = np.array([1])
+    xi1, xi2 = np.array(1), np.array(1)
+    N_i = np.arange(n0, n1, N)
+    h_i = xi_N/N_i[::-1]
+    for h in h_i:
+        print(h)
+        theta1, xi1, _ = euler(y, f, 3, h)
+        theta2, xi2, _ = RK4_method(y, f, 3, h)
+        Euler_err = np.append(Euler_err, np.abs(theta1[-1]))
+        RK4_err = np.append(RK4_err, np.abs(theta2[-1]))
+    return Euler_err[1:], RK4_err[1:], h_i, xi1[-1], xi2[-1]
 
-irele_err, urele_err, irelrk_err, urelrk_err = error_n(0.001, 0.9, 2)
 
-x = np.linspace(0.001, 0.9, 2)
 
-plt.figure()
-plt.plot(x, irele_err, '-.', label="irel euler error")
-plt.plot(x, irelrk_err, '-.', label="irel RK4 error")
-plt.legend()
-plt.ylabel("h error")
-plt.xlabel("trinnlengde h")
-plt.show()
+def plot1_3g(n0, n1, N):
+    """
+    Plot-function for the ultra-relativistic case in task 3g
+    :param n0: Starting-step
+    :param n1: End-step
+    :param N: Stepsice
+    :return: Nothing, plots the graph
+    """
+    Euler_err, RK4_err, h_i, xi1, xi2 = error_funk(n0, n1, N, xiN3)
+    plt.figure()
+    plt.plot(h_i, Euler_err, '-.', label="Ultrarelativistisk euler error")
+    plt.plot(h_i, RK4_err, '-.', label="Ultrarelativistisk RK4 error")
+    plt.legend()
+    plt.xscale('log')
+    plt.yscale('log')
+    plt.ylabel("Theta error")
+    plt.xlabel("Trinnlengde h")
+    plt.show()
 
-plt.figure()
-plt.plot(x, urele_err, '-.', label="urel euler error")
-plt.plot(x, urelrk_err, '-.', label="urel RK4 error")
-plt.legend()
-plt.ylabel("h error")
-plt.xlabel("trinnlengde h")
-plt.show()
 
+def plot2_3g(n0, n1, N):
+    """
+    Plot-function for the non-relativistic case in task 3g
+    :param n0: Starting-step
+    :param n1: End-step
+    :param N: Stepsize
+    :return: Nothing, plots the graph
+    """
+    Euler_err, RK4_err, h_i, xi1, xi2 = error_funk(n0, n1, N, xiN3_2)
+    plt.figure()
+    plt.plot(h_i, Euler_err, '-.', label="Ikke-relativistisk euler error")
+    plt.plot(h_i, RK4_err, '-.', label="Ikke-relativistisk RK4 error")
+    plt.legend()
+    plt.xscale('log')
+    plt.yscale('log')
+    plt.ylabel("Theta error")
+    plt.xlabel("Trinnlengde h")
+    plt.show()
+
+
+#Plotter oppgave 3d
+#plot3_d_f(euler, "Numerical solution with the Euler-method")
+
+#Plotter oppgave 3f
+#plot3_d_f(RK4_method, "Numerical solution with the RK4-method")
+
+plot1_3g(1, 1000, 1)
