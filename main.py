@@ -97,13 +97,14 @@ def pfunc(x, alpha, p): return -0.5*alpha*x*(1+p)*(1+3*p)*(1-x**2*alpha)**-1
 
 def solv_p(alph, pfunc, h):
     p0 = (np.sqrt(1-alph)-1)/(1-3*np.sqrt(1-alph))
-    solved_p = np.array([1,1],[2,2],[3,3])
+    solved_p = np.array([[1,1],[2,2],[3,3]])
     for i in range(3):
         solved_p[i][0] = euler(p0, pfunc, alph, h)
         solved_p[i][1] = RK4_method(p0, pfunc, alph, h)
     return solved_p
 
-def analy_p( x, alph): return ((np.sqrt(1-alph)-np.sqrt(1-alph*x**2))/(np.sqrt(1-alph*x**2)-3*np.sqrt(1-alph)))
+def analy_p( x, alph): return (((np.sqrt(1-alph)-np.sqrt(1-alph*x**2))/(np.sqrt(1-alph*x**2)-3*np.sqrt(1-alph))))/ \
+                              ((np.sqrt(1-alph)-1)/(1-3*np.sqrt(1-alph)))
 
 
 def plot3_d_f(method, title, n=1, y=y, f=f):
@@ -131,8 +132,6 @@ def plot3_d_f(method, title, n=1, y=y, f=f):
     plt.xlabel(r"$\xi$")
     plt.ylabel(r"$\theta(\xi)$")
     plt.show()
-
-
 
 
 def plot1_3g(n0, n1, N):
@@ -190,9 +189,14 @@ def plot3_i(alph, solved_p, analy_p, h, a ):
         plt.show()
 
 #Plotter oppgave 3d
-plot3_d_f(euler, "Numerical solution with the Euler-method")
+#plot3_d_f(euler, "Numerical solution with the Euler-method")
 
 #Plotter oppgave 3f
-plot3_d_f(RK4_method, "Numerical solution with the RK4-method")
+#plot3_d_f(RK4_method, "Numerical solution with the RK4-method")
 
 #plot1_3g(1, 1000, 1)
+
+# oppg 3i
+alp =[0.86, 0.59, 0.0167]
+solved_p = solv_p(alp, pfunc, 0.01)
+plot3_i(alp, solved_p, analy_p, 0.01, False)
