@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-def f(xi, y, n): return np.array([y[1], -y[0]**n - 2*y[1]/xi])
+def f(xi, y, n): return np.array([y[1], -np.abs(y[0])**n - 2*y[1]/xi])
 
 
 def euler(y, f, n, h):
@@ -14,7 +14,7 @@ def euler(y, f, n, h):
     """
     theta = np.array([y[0]])
     chi = np.array([y[1]])
-    xi = np.array([.001])
+    xi = np.array([.00001])
     switch = True
     while switch:
         F = f(xi[-1], [theta[-1], chi[-1]], n)
@@ -23,7 +23,7 @@ def euler(y, f, n, h):
         xi = np.append(xi, xi[-1]+h)
         if theta[-1]*theta[-2]<0:
             switch = False
-    return xi, theta, chi
+    return theta, xi, chi
 
 
 def RK4_step(xi, y, f, h, n):
@@ -55,7 +55,7 @@ def RK4_method(y, f, n, h):
     """
     theta = np.array([y[0]])
     chi = np.array([y[1]])
-    xi = np.array([.001])
+    xi = np.array([.00001])
     switch = True
     while switch:
         F = RK4_step(xi[-1], [theta[-1], chi[-1]], f, h, n)
@@ -68,56 +68,71 @@ def RK4_method(y, f, n, h):
 
 
 y = np.array([1,0])
-n = 1
 
 
-def error_n(h0, h1, trinn):
-    """
-    theta1 ,_,_ = euler (y, g1, g2, h0, 3 / 2)
-    theta2 ,_,_= euler (y, g1, g2, h0, 3)
-    theta3 ,_,_= RK4_method(y, f, 3/2, h0)
-    theta4 ,_,_= RK4_method (y, f, 3, h0)
-    """
+
+def error_n(xi0, xii, xiu, trinn):
     irele_err = np.array([1])
     urele_err = np.array([1])
     irelrk_err = np.array([1])
     urelrk_err = np.array([1])
-    h_list = np.linspace(h1, h0, trinn)
-    for i in h_list:
-        print ("i :", i)
-        theta1,_ ,_ = euler (y, f, 3/2, i)
-        print ("i :", i)
+    hi_trinn = xii/trinn
+    hu_trinn = xiu/trinn
+    j = hi_trinn
+    i = hu_trinn
+    while j != xii:
+        print("euler irel", j)
+        theta1, _, _ = euler (y, f, 3 / 2, j)
+        print("rk4 irel", j)
+        theta3, _, _ = RK4_method (y, f, 3 / 2, j)
+        irele_err = np.append (irele_err, theta1[-1])
+        irelrk_err = np.append (irelrk_err, theta3[-1])
+        j += hi_trinn
+
+    while i != xiu:
+        print ("euler urel :", i)
         theta2,_,_ = euler (y, f, 3, i)
-        print ("i :", i)
-        theta3,_,_ = RK4_method (y, f, 3 / 2, i)
-        print ("i :", i)
+        print ("rk4 urel :", i)
         theta4,_,_ = RK4_method (y, f, 3, i)
-        irele_err = np.append(irele_err, theta1[-1])
         urele_err = np.append(urele_err, theta2[-1])
-        irelrk_err = np.append(irelrk_err, theta3[-1])
         urelrk_err = np.append(urelrk_err, theta4[-1])
-        print("i :",i)
-    return irele_err, urele_err, irelrk_err, urelrk_err
+        i += hu_trinn
+    return irele_err[1:], urele_err[1:], irelrk_err[1:], urelrk_err[1:], hi_trinn, hu_trinn
 
 
 #plott for oppg 3g
 
-irele_err, urele_err, irelrk_err, urelrk_err = error_n(0.001, 0.9, 2)
+irele_err, urele_err, irelrk_err, urelrk_err, Ni, Nu = error_n(0.001, 3.653753736219229, 6.89684861937, 10)
 
-x = np.linspace(0.001, 0.9, 2)
 
 plt.figure()
-plt.plot(x, irele_err, '-.', label="irel euler error")
-plt.plot(x, irelrk_err, '-.', label="irel RK4 error")
+plt.plot(Ni, irele_err, '-.', label="irel euler error")
+
 plt.legend()
+plt.xscale("log")
+plt.yscale("log")
 plt.ylabel("h error")
 plt.xlabel("trinnlengde h")
+plt.title("Irel error plott")
+plt.show()
+plt.figure()
+
+plt.plot(Ni, irelrk_err, '-.', label="irel RK4 error")
+plt.legend()
+plt.xscale("log")
+plt.yscale("log")
+plt.ylabel("h error")
+plt.xlabel("trinnlengde h")
+plt.title("Irel error plott")
 plt.show()
 
 plt.figure()
-plt.plot(x, urele_err, '-.', label="urel euler error")
-plt.plot(x, urelrk_err, '-.', label="urel RK4 error")
+plt.plot(Nu, urele_err, '-.', label="urel euler error")
+plt.plot(Nu, urelrk_err, '-.', label="urel RK4 error")
 plt.legend()
+plt.xscale("log")
+plt.yscale("log")
+plt.title("Urel error plot")
 plt.ylabel("h error")
 plt.xlabel("trinnlengde h")
 plt.show()
