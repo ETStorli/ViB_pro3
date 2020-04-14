@@ -103,6 +103,7 @@ def euler_error(y, f, n, h, N):
         xi = np.append(xi, xi[-1]+h)
     return xi, Y
 
+
 def RK4_method_error(y, f, n, h, N):
     """
     Calls on RK4_step() to calculate the next values of theta and xi for each iteration
@@ -120,6 +121,7 @@ def RK4_method_error(y, f, n, h, N):
         Y = np.hstack((Y, [[item] for item in F]))
         xi = np.append(xi, xi[-1]+h)
     return xi, Y
+
 
 def error_funk(n0, n1, N, xi_N, n):
     """
@@ -144,9 +146,11 @@ def error_funk(n0, n1, N, xi_N, n):
         RK4_err = np.append(RK4_err, np.abs(Y2[0][-1]))
     return Euler_err[1:], RK4_err[1:], h_i, xi1[-1], xi2[-1]
 
+
 def pfunc(x, p, alpha): return np.array(-0.5*alpha*x*(1+p)*(1+3*p)*(1-x**2*alpha)**-1)
 def analy_p(x, alpha): return ((np.sqrt(1-alpha)-np.sqrt(1-alpha*x**2))/(np.sqrt(1-alpha*x**2)-3*np.sqrt(1-alpha)))/ \
                               ((np.sqrt(1-alpha)-1)/(1-3*np.sqrt(1-alpha)))
+
 
 def P(alpha, h, switch=False):
     """
@@ -157,14 +161,15 @@ def P(alpha, h, switch=False):
     """
     for i in range(len(alpha)):
         p0 = np.array([[(np.sqrt(1 - alpha[i]) - 1) / (1 - 3 * np.sqrt(1 - alpha[i]))]])
+        print(p0)
         xi1, Y1 = euler(p0, pfunc, alpha[i], h)
         xi2, Y2 = RK4_method(p0, pfunc, alpha[i], h)
         plt.figure()
-        plt.plot(xi1, Y1[0], label="Euler")
-        plt.plot(xi2, Y2[0],'-.', label="RK4")
-        plt.plot(xi1, analy_p(xi1, alpha[i]), label="Analyisk")
+        plt.plot(xi1, Y1[0]/p0[0][0], '-.', label="Euler")
+        plt.plot(xi2, Y2[0]/p0[0][0],'-.', label="RK4")
+        plt.plot(xi1, analy_p(xi1, alpha[i]),'-.', label="Analyisk")
         if switch:
-            plt.plot(xi1, 0.25*alpha[i]*(1-xi1**2), '-.', label="Newtonian approximation")
+            plt.plot(xi1, 0.25*alpha[i]*(1-xi1**2)/p0[0][0], '-.', label="Newtonian approximation")
         plt.legend(loc='best')
         plt.xlabel("x-axis")
         plt.ylabel("P-axis")
@@ -254,8 +259,6 @@ def plot3_2g(n0, n1, N):
     plt.show()
 
 
-
-
 #Plotter oppgave 3d
 #plot3_d_f(euler, "Numerical solution with the Euler-method, n=1")
 
@@ -266,8 +269,8 @@ def plot3_2g(n0, n1, N):
 #plot3_d_f(RK4_method, "Numerical solution with the RK4-method, n=1")
 
 #Plotter oppgave 3g
-plot3_1g(10, 1000, 1)
-plot3_2g(10, 1000, 1)
+#plot3_1g(10, 1000, 1)
+#plot3_2g(10, 1000, 1)
 
 #Plotter oppgave 3i
 #P(alpha, 0.001)
