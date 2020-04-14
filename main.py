@@ -9,7 +9,7 @@ alpha = np.array([0.86, 0.59, 0.0167])
 
 def f(xi, y, n):
     """
-    Vector form of the Lane Embden equations. Modified with the correct value of \xi' for \xi = 0 (from piazza)
+    Vector form of the Lane Embden equations. Modified with the correct value of xi' for xi = 0 (from piazza)
     :param xi: Previous value of xi
     :param y: Array with the previous values
     :param n: Polytropic index
@@ -87,7 +87,7 @@ def RK4_method(y, f, n, h):
 def euler_error(y, f, n, h, N):
     """
     Numerically solves differential equations with the Euler-method
-    This function is ment for the error calculation, such that the last value of \xi is either xiN3_2 or xiN3
+    This function is ment for the error calculation, such that the last value of xi is either xiN3_2 or xiN3
     :param y: Vector with initial values for theta and chi respectively
     :param f: Stepfunction used for the numerical approximation
     :param n: Polytropic index
@@ -96,17 +96,17 @@ def euler_error(y, f, n, h, N):
     """
     Y = y
     xi = np.array([0])
-    for i in range(N+1):
+    for i in range(N):
         F = f(xi[-1], Y[:, -1], n)      #Y, last item of every array in Y
         placeholder = Y[:,-1] + h*F
         Y = np.hstack((Y, [[item] for item in placeholder]))
         xi = np.append(xi, xi[-1]+h)
-    return xi[:-1], Y
+    return xi, Y
 
 def RK4_method_error(y, f, n, h, N):
     """
     Calls on RK4_step() to calculate the next values of theta and xi for each iteration
-    This function is ment for the error calculation, such that the last value of \xi is either xiN3_2 or xiN3
+    This function is ment for the error calculation, such that the last value of xi is either xiN3_2 or xiN3
     :param y: Vector with initial values for theta and chi respectively
     :param f: Stepfunction used for the numerical approximation
     :param n: Polytropic index
@@ -115,11 +115,11 @@ def RK4_method_error(y, f, n, h, N):
     """
     Y = y
     xi = np.array([0])
-    for i in range(N+1):
+    for i in range(N):
         F = RK4_step(xi[-1], Y[:, -1], f, h, n)
         Y = np.hstack((Y, [[item] for item in F]))
         xi = np.append(xi, xi[-1]+h)
-    return xi[:-1],Y
+    return xi, Y
 
 def error_funk(n0, n1, N, xi_N, n):
     """
@@ -231,6 +231,7 @@ def plot3_1g(n0, n1, N):
     plt.yscale('log')
     plt.ylabel("Theta error")
     plt.xlabel("Trinnlengde h")
+    plt.title("Error-plot for RK4 og Euler")
     plt.show()
 def plot3_2g(n0, n1, N):
     """
@@ -249,6 +250,7 @@ def plot3_2g(n0, n1, N):
     plt.yscale('log')
     plt.ylabel("Theta error")
     plt.xlabel("Trinnlengde h")
+    plt.title("Error-plot for RK4 og Euler")
     plt.show()
 
 
@@ -264,8 +266,8 @@ def plot3_2g(n0, n1, N):
 #plot3_d_f(RK4_method, "Numerical solution with the RK4-method, n=1")
 
 #Plotter oppgave 3g
-#plot3_1g(10, 100, 1)
-#plot3_2g(10, 100, 1)
+plot3_1g(10, 1000, 1)
+plot3_2g(10, 1000, 1)
 
 #Plotter oppgave 3i
 #P(alpha, 0.001)
